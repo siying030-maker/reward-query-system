@@ -213,7 +213,7 @@ def load_reward_data(url):
 # 標題
 # ==============================
 
-st.title("📋 獎懲查詢系統")
+
 
 semester = get_current_semester()
 
