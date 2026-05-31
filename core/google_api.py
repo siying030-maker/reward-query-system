@@ -47,4 +47,4 @@ def open_sheet(url):
             else:
                 raise e
 
-    raise Exception("Google API 過載")
+    raise Exception("Google API 過載，請稍後再試")
