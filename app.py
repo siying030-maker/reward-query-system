@@ -30,6 +30,13 @@ st.markdown("""
     padding-right:1rem;
 }
 
+/* 修正標題被切 */
+h1{
+    line-height:1.4 !important;
+    padding-top:8px !important;
+    overflow:visible !important;
+}
+
 /* 查詢按鈕 */
 .stButton > button,
 .stFormSubmitButton > button{
@@ -56,12 +63,18 @@ st.markdown("""
 @media (max-width:768px){
 
     .block-container{
+        padding-top:1.5rem !important;
         padding-left:0.5rem;
         padding-right:0.5rem;
     }
 
     h1{
-        font-size:1.8rem;
+        font-size:1.8rem !important;
+        line-height:1.4 !important;
+        padding-top:8px !important;
+        margin-top:0 !important;
+        margin-bottom:1rem !important;
+        overflow:visible !important;
     }
 
     [data-testid="metric-container"]{
