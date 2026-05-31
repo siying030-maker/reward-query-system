@@ -1,5 +1,8 @@
+```python
 import streamlit as st
 import pandas as pd
+
+from datetime import datetime
 
 from core.google_api import open_sheet
 
@@ -8,11 +11,14 @@ from core.google_api import open_sheet
 # ==============================
 
 st.set_page_config(
-    
     page_title="獎懲查詢系統",
     page_icon="📋",
     layout="wide"
 )
+
+# ==============================
+# 手機版優化
+# ==============================
 
 st.markdown("""
 <style>
@@ -74,7 +80,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================
-# 試算表設定
+# 學期判斷表
+# ==============================
+
+SEMESTER_CONFIG_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    "18tZv6d8Ja19ZZy5rPuIWMrB5c4NnMqbnwh9SegW-9-Y/edit"
+)
+
+SEMESTER_CONFIG_SHEET = "工作表1"
+
+# ==============================
+# 獎懲資料表
 # ==============================
 
 SEMESTER_SHEETS = {
@@ -122,9 +139,38 @@ def make_unique_columns(columns):
 
     return result
 
+# ==============================
+# 自動判斷學期
+# ==============================
+
+@st.cache_data(ttl=3600)
+def get_current_semester():
+
+    ss = open_sheet(SEMESTER_CONFIG_URL)
+
+    ws = ss.worksheet(SEMESTER_CONFIG_SHEET)
+
+    values = ws.get_all_records()
+
+    today = datetime.now().date()
+
+    for row in values:
+
+        start_date = pd.to_datetime(
+            row["開始日期"]
+        ).date()
+
+        end_date = pd.to_datetime(
+            row["結束日期"]
+        ).date()
+
+        if start_date <= today <= end_date:
+            return row["學期"]
+
+    return None
 
 # ==============================
-# 讀取資料
+# 讀取獎懲資料
 # ==============================
 
 @st.cache_data(ttl=1800)
@@ -148,16 +194,13 @@ def load_reward_data(url):
 
     df.columns = df.columns.astype(str).str.strip()
 
-    # 移除完全空白列
     df = df.dropna(how="all")
 
-    # 移除學號空白
     if "學號" in df.columns:
         df["學號"] = df["學號"].astype(str).str.strip()
         df = df[df["學號"] != ""]
 
     return df
-
 
 # ==============================
 # 標題
@@ -165,10 +208,23 @@ def load_reward_data(url):
 
 st.title("📋 獎懲查詢系統")
 
-semester = st.selectbox(
-    "選擇學期",
-    ["上學期", "下學期"]
+semester = get_current_semester()
+
+if semester is None:
+
+    st.error(
+        "目前日期不在任何學期區間內，請聯絡管理員。"
+    )
+
+    st.stop()
+
+st.info(
+    f"目前學期：{semester}"
 )
+
+# ==============================
+# 查詢區
+# ==============================
 
 with st.form("query_form"):
 
@@ -189,7 +245,6 @@ if student_id.strip() == "":
     st.warning("請輸入學號")
     st.stop()
 
-
 # ==============================
 # 讀取資料
 # ==============================
@@ -207,10 +262,6 @@ except Exception as e:
     st.exception(e)
 
     st.stop()
-
-# ==============================
-# 檢查資料
-# ==============================
 
 if df.empty:
 
@@ -230,14 +281,14 @@ if missing_columns:
         f"缺少欄位：{', '.join(missing_columns)}"
     )
 
-    st.write("目前讀到欄位：")
+    st.write("目前欄位：")
 
     st.write(list(df.columns))
 
     st.stop()
 
 # ==============================
-# 查詢學號
+# 查詢
 # ==============================
 
 student_id = student_id.strip().upper()
@@ -255,25 +306,21 @@ result = df[
 
 if result.empty:
 
-    st.warning("無獎懲紀錄")
+    st.warning("查無獎懲資料")
 
     st.stop()
-
-# ==============================
-# 顯示結果
-# ==============================
 
 result = result[DISPLAY_COLUMNS].copy()
 
 total_records = len(result)
 
+# ==============================
+# 結果
+# ==============================
+
 st.success(
     f"查詢成功，共找到 {total_records} 筆紀錄。"
 )
-
-# ==============================
-# 統計
-# ==============================
 
 st.subheader("📊 查詢統計")
 
@@ -282,10 +329,6 @@ st.metric(
     total_records
 )
 
-# ==============================
-# 資料表
-# ==============================
-
 st.subheader("📄 查詢結果")
 
 st.dataframe(
@@ -293,3 +336,4 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+```
