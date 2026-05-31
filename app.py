@@ -9,11 +9,11 @@ from core.google_api import open_sheet
 # 頁面設定
 # ==============================
 
-st.set_page_config(
-    page_title="獎懲查詢系統",
-    page_icon="📋",
-    layout="wide"
-)
+st.markdown("""
+<div class="custom-title">
+📋 獎懲查詢系統
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================
 # 手機版優化
@@ -24,17 +24,17 @@ st.markdown("""
 
 /* 頁面邊距 */
 .block-container{
-    padding-top:1rem;
+    padding-top:4rem;
     padding-bottom:1rem;
     padding-left:1rem;
     padding-right:1rem;
 }
 
-/* 修正標題被切 */
-h1{
-    line-height:1.4 !important;
-    padding-top:8px !important;
-    overflow:visible !important;
+/* 自訂標題 */
+.custom-title{
+    font-size:2.3rem;
+    font-weight:700;
+    margin-bottom:1rem;
 }
 
 /* 查詢按鈕 */
@@ -63,18 +63,13 @@ h1{
 @media (max-width:768px){
 
     .block-container{
-        padding-top:1.5rem !important;
+        padding-top:4rem !important;
         padding-left:0.5rem;
         padding-right:0.5rem;
     }
 
-    h1{
-        font-size:1.8rem !important;
-        line-height:1.4 !important;
-        padding-top:8px !important;
-        margin-top:0 !important;
-        margin-bottom:1rem !important;
-        overflow:visible !important;
+    .custom-title{
+        font-size:1.8rem;
     }
 
     [data-testid="metric-container"]{
