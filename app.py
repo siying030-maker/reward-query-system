@@ -8,10 +8,70 @@ from core.google_api import open_sheet
 # ==============================
 
 st.set_page_config(
+    
     page_title="獎懲查詢系統",
     page_icon="📋",
     layout="wide"
 )
+
+st.markdown("""
+<style>
+
+/* 頁面邊距 */
+.block-container{
+    padding-top:1rem;
+    padding-bottom:1rem;
+    padding-left:1rem;
+    padding-right:1rem;
+}
+
+/* 查詢按鈕 */
+.stButton > button,
+.stFormSubmitButton > button{
+    height:50px;
+    font-size:18px;
+    font-weight:bold;
+    border-radius:12px;
+}
+
+/* Metric卡片 */
+[data-testid="metric-container"]{
+    text-align:center;
+    border-radius:12px;
+    padding:15px;
+    background-color:#f8f9fa;
+}
+
+/* DataFrame字體 */
+[data-testid="stDataFrame"]{
+    font-size:14px;
+}
+
+/* 手機版 */
+@media (max-width:768px){
+
+    .block-container{
+        padding-left:0.5rem;
+        padding-right:0.5rem;
+    }
+
+    h1{
+        font-size:1.8rem;
+    }
+
+    [data-testid="metric-container"]{
+        padding:10px;
+    }
+
+    .stFormSubmitButton > button{
+        width:100%;
+        height:55px;
+        font-size:20px;
+    }
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ==============================
 # 試算表設定
@@ -105,12 +165,6 @@ def load_reward_data(url):
 
 st.title("📋 獎懲查詢系統")
 
-st.write("請選擇學期並輸入學號查詢")
-
-# ==============================
-# 查詢區
-# ==============================
-
 semester = st.selectbox(
     "選擇學期",
     ["上學期", "下學期"]
@@ -128,14 +182,13 @@ with st.form("query_form"):
         use_container_width=True
     )
 
-# 尚未按查詢
 if not search_btn:
     st.stop()
 
-# 未輸入學號
 if student_id.strip() == "":
     st.warning("請輸入學號")
     st.stop()
+
 
 # ==============================
 # 讀取資料
@@ -202,7 +255,7 @@ result = df[
 
 if result.empty:
 
-    st.warning("查無此學號資料")
+    st.warning("無獎懲紀錄")
 
     st.stop()
 
